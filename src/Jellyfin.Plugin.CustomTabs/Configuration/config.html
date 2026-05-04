@@ -2,6 +2,11 @@
 <html lang="en" xmlns="http://www.w3.org/1999/html">
 <head>
     <title>Custom Tabs</title>
+    <style>
+        .glow-settings {
+            display: none;
+        }
+    </style>
 </head>
 <body>
 <div data-role="page" id="customTabsConfigurationPage" class="page type-interior pluginConfigurationPage fullWidthContent">
@@ -10,7 +15,7 @@
             <div class="sectionTitleContainer">
                 <h2 class="sectionTitle">Custom Tabs</h2>
                 <a is="emby-linkbutton" class="raised raised-mini" style="margin-left: 2em;" target="_blank"
-                   href="https://github.com/IAmParadox27/jellyfin-plugin-custom-tabs">
+                   href="https://github.com/noahterbest/jellyfin-custom-tabs-with-effects">
                     <i class="md-icon button-icon button-icon-left secondaryText"></i>
                     <span>Help</span>
                 </a>
@@ -47,6 +52,51 @@
                 </textarea>
                 <div class="fieldDescription">The html that should be displayed when this tab is shown.</div>
             </div>
+            <div class="selectContainer">
+                <label class="selectLabel" for="templateGlowEnabled">Enable Glow Effect</label>
+                <label style="margin-left: 1em;"><input type="checkbox" is="emby-checkbox" data-id="templateGlowEnabled" />On</label>
+                <div class="fieldDescription">Enable a glow effect around the tab button.</div>
+            </div>
+            <div class="glow-settings">
+                <div class="inputContainer">
+                    <label class="inputLabel inputLabelUnfocused" for="templateGlowIntensity">Glow Intensity</label>
+                    <label class="inputLabel inputLabelUnfocused" for="templateGlowIntensity"></label>
+                    <input id="templateGlowIntensity" data-id="txtGlowIntensity" type="range" is="emby-input" class="emby-input" min="0" max="10" value="10" step="1">
+                    <div class="fieldDescription">Adjust the glow intensity (0-10px).</div>
+                </div>
+                <div class="inputContainer">
+                    <label class="inputLabel inputLabelUnfocused" for="templateGlowColor">Glow Color</label>
+                    <label class="inputLabel inputLabelUnfocused" for="templateGlowColor"></label>
+                    <input id="templateGlowColor" data-id="txtGlowColor" type="color" is="emby-input" class="emby-input" style="padding: 0; height: 2.8em;" value="#00ffff">
+                    <div class="fieldDescription">Choose the glow color.</div>
+                </div>
+                <div class="selectContainer">
+                    <label class="selectLabel" for="templateRgbAnimationEnabled">Enable RGB Animation</label>
+                    <label style="margin-left: 1em;"><input type="checkbox" is="emby-checkbox" data-id="templateRgbAnimationEnabled" />On</label>
+                    <div class="fieldDescription">Cycles through all colors continuously (replaces static glow color).</div>
+                </div>
+                <div class="rgb-content">
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="templateRgbSpeed">Animation Speed (ms)</label>
+                        <label class="inputLabel inputLabelUnfocused" for="templateRgbSpeed"></label>
+                        <input id="templateRgbSpeed" data-id="txtRgbSpeed" type="range" is="emby-input" class="emby-input" min="200" max="5000" value="2000" step="100">
+                        <div class="fieldDescription">Adjust the RGB cycle speed (200-5000ms per full cycle).</div>
+                    </div>
+                </div>
+                <div class="selectContainer">
+                    <label class="selectLabel" for="templateHeartbeatEnabled">Enable Heartbeat Animation</label>
+                    <label style="margin-left: 1em;"><input type="checkbox" is="emby-checkbox" data-id="templateHeartbeatEnabled" />On</label>
+                    <div class="fieldDescription">Pulse the glow effect with a heartbeat animation (requires Glow Effect to be enabled).</div>
+                </div>
+                <div class="heartbeat-content">
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="templateHeartbeatSpeed">Animation Speed (ms)</label>
+                        <label class="inputLabel inputLabelUnfocused" for="templateHeartbeatSpeed"></label>
+                        <input id="templateHeartbeatSpeed" data-id="txtHeartbeatSpeed" type="range" is="emby-input" class="emby-input" min="200" max="3000" value="800" step="50">
+                        <div class="fieldDescription">Adjust the heartbeat animation speed (200-3000ms per cycle).</div>
+                    </div>
+                </div>
+            </div>
             <button data-id="templateRemoveTab" is="emby-button" type="button" class="emby-button raised block">
                 <span>Remove</span>
             </button>
@@ -76,8 +126,15 @@
                         const tab = {
                             Title: tabConfig.querySelector("[data-id=txtDisplayText]").value,
                             ContentHtml: tabConfig.querySelector("[data-id=templateHtmlContent]").value,
+                            GlowEnabled: tabConfig.querySelector("[data-id=templateGlowEnabled]").checked,
+                            GlowColor: tabConfig.querySelector("[data-id=txtGlowColor]").value,
+                            GlowIntensity: parseInt(tabConfig.querySelector("[data-id=txtGlowIntensity]").value, 10),
+                            HeartbeatEnabled: tabConfig.querySelector("[data-id=templateHeartbeatEnabled]").checked,
+                            HeartbeatSpeed: parseInt(tabConfig.querySelector("[data-id=txtHeartbeatSpeed]").value, 10),
+                            RgbAnimationEnabled: tabConfig.querySelector("[data-id=templateRgbAnimationEnabled]").checked,
+                            RgbSpeed: parseInt(tabConfig.querySelector("[data-id=txtRgbSpeed]").value, 10),
                         };
-                        
+
                         config.Tabs.push(tab);
                     });
 
@@ -114,6 +171,23 @@
                             CustomTabsConfig.removeTab(el);
                         }
                     });
+                    CustomTabsConfig.configurationWrapper.addEventListener("change", (event) => {
+                        if (event.target.getAttribute('data-id') === "templateGlowEnabled") {
+                            const tabConfig = event.target.closest("[data-id=tab-config]");
+                            const glowSettings = tabConfig.querySelector(".glow-settings");
+                            CustomTabsConfig.toggleGlowSettings(glowSettings, event.target.checked);
+                        }
+                        if (event.target.getAttribute('data-id') === "templateHeartbeatEnabled") {
+                            const tabConfig = event.target.closest("[data-id=tab-config]");
+                            const heartbeatContent = tabConfig.querySelector(".heartbeat-content");
+                            CustomTabsConfig.toggleHeartbeatContent(heartbeatContent, event.target.checked);
+                        }
+                        if (event.target.getAttribute('data-id') === "templateRgbAnimationEnabled") {
+                            const tabConfig = event.target.closest("[data-id=tab-config]");
+                            const rgbContent = tabConfig.querySelector(".rgb-content");
+                            CustomTabsConfig.toggleRgbContent(rgbContent, event.target.checked);
+                        }
+                    });
                     CustomTabsConfig.loadConfig();
                 },
                 addCustomTabNew: function() {
@@ -121,6 +195,16 @@
 
                     template.querySelector('[data-id=txtDisplayText]').value = 'New Tab';
                     template.querySelector('[data-id=templateHtmlContent]').value = '';
+                    template.querySelector('[data-id=templateGlowEnabled]').checked = false;
+                    template.querySelector('[data-id=txtGlowColor]').value = '#00ffff';
+                    template.querySelector('[data-id=txtGlowIntensity]').value = '10';
+                    template.querySelector('[data-id=templateHeartbeatEnabled]').checked = false;
+                    template.querySelector('[data-id=txtHeartbeatSpeed]').value = '800';
+                    template.querySelector('[data-id=templateRgbAnimationEnabled]').checked = false;
+                    template.querySelector('[data-id=txtRgbSpeed]').value = '2000';
+                    template.querySelector('.glow-settings').style.display = 'none';
+                    template.querySelector('.heartbeat-content').style.display = 'none';
+                    template.querySelector('.rgb-content').style.display = 'none';
 
                     const el = CustomTabsConfig.configurationWrapper.appendChild(template);
                 },
@@ -129,11 +213,105 @@
                     //template.querySelector('[data-id=hiddenSectionId]').value = tabConfig.SectionId;
                     template.querySelector('[data-id=txtDisplayText]').value = tabConfig.Title;
                     template.querySelector('[data-id=templateHtmlContent]').value = tabConfig.ContentHtml;
+                    template.querySelector('[data-id=templateGlowEnabled]').checked = tabConfig.GlowEnabled || false;
+                    template.querySelector('[data-id=txtGlowColor]').value = tabConfig.GlowColor || '#00ffff';
+                    template.querySelector('[data-id=txtGlowIntensity]').value = tabConfig.GlowIntensity != null ? tabConfig.GlowIntensity : '10';
+                    template.querySelector('[data-id=templateHeartbeatEnabled]').checked = tabConfig.HeartbeatEnabled || false;
+                    template.querySelector('[data-id=txtHeartbeatSpeed]').value = tabConfig.HeartbeatSpeed != null ? tabConfig.HeartbeatSpeed : '800';
+                    template.querySelector('[data-id=templateRgbAnimationEnabled]').checked = tabConfig.RgbAnimationEnabled || false;
+                    template.querySelector('[data-id=txtRgbSpeed]').value = tabConfig.RgbSpeed != null ? tabConfig.RgbSpeed : '2000';
+                    template.querySelector('.glow-settings').style.display = (tabConfig.GlowEnabled || false) ? 'block' : 'none';
+                    template.querySelector('.heartbeat-content').style.display = (tabConfig.HeartbeatEnabled || false) ? 'block' : 'none';
+                    template.querySelector('.rgb-content').style.display = (tabConfig.RgbAnimationEnabled || false) ? 'block' : 'none';
 
                     const el = CustomTabsConfig.configurationWrapper.appendChild(template);
                 },
                 removeTab: function(elem) {
                     elem.remove();
+                },
+                toggleHeartbeatContent: function(hbContentEl, show) {
+                    const duration = 300;
+                    hbContentEl.style.display = 'block';
+                    hbContentEl.style.overflow = 'hidden';
+                    const startHeight = show ? 0 : hbContentEl.scrollHeight;
+                    const endHeight = show ? hbContentEl.scrollHeight : 0;
+                    hbContentEl.style.maxHeight = startHeight + 'px';
+                    const startTime = performance.now();
+                    const step = (now) => {
+                        const elapsed = now - startTime;
+                        const progress = Math.min(elapsed / duration, 1);
+                        const eased = 1 - Math.pow(1 - progress, 3);
+                        const currentHeight = startHeight + (endHeight - startHeight) * eased;
+                        hbContentEl.style.maxHeight = currentHeight + 'px';
+                        if (progress < 1) {
+                            requestAnimationFrame(step);
+                        } else {
+                            if (show) {
+                                hbContentEl.style.maxHeight = '';
+                                hbContentEl.style.overflow = '';
+                            } else {
+                                hbContentEl.style.maxHeight = '0';
+                                hbContentEl.style.overflow = 'hidden';
+                            }
+                        }
+                    };
+                    requestAnimationFrame(step);
+                },
+                toggleRgbContent: function(rgbContentEl, show) {
+                    const duration = 300;
+                    rgbContentEl.style.display = 'block';
+                    rgbContentEl.style.overflow = 'hidden';
+                    const startHeight = show ? 0 : rgbContentEl.scrollHeight;
+                    const endHeight = show ? rgbContentEl.scrollHeight : 0;
+                    rgbContentEl.style.maxHeight = startHeight + 'px';
+                    const startTime = performance.now();
+                    const step = (now) => {
+                        const elapsed = now - startTime;
+                        const progress = Math.min(elapsed / duration, 1);
+                        const eased = 1 - Math.pow(1 - progress, 3);
+                        const currentHeight = startHeight + (endHeight - startHeight) * eased;
+                        rgbContentEl.style.maxHeight = currentHeight + 'px';
+                        if (progress < 1) {
+                            requestAnimationFrame(step);
+                        } else {
+                            if (show) {
+                                rgbContentEl.style.maxHeight = '';
+                                rgbContentEl.style.overflow = '';
+                            } else {
+                                rgbContentEl.style.maxHeight = '0';
+                                rgbContentEl.style.overflow = 'hidden';
+                            }
+                        }
+                    };
+                    requestAnimationFrame(step);
+                },
+                toggleGlowSettings: function(glowEl, show) {
+                    const duration = 300;
+                    glowEl.style.display = 'block';
+                    glowEl.style.overflow = 'hidden';
+                    const startHeight = show ? 0 : glowEl.scrollHeight;
+                    const endHeight = show ? glowEl.scrollHeight : 0;
+                    glowEl.style.height = startHeight + 'px';
+                    const startTime = performance.now();
+                    const step = (now) => {
+                        const elapsed = now - startTime;
+                        const progress = Math.min(elapsed / duration, 1);
+                        const eased = 1 - Math.pow(1 - progress, 3);
+                        const currentHeight = startHeight + (endHeight - startHeight) * eased;
+                        glowEl.style.height = currentHeight + 'px';
+                        if (progress < 1) {
+                            requestAnimationFrame(step);
+                        } else {
+                            if (show) {
+                                glowEl.style.height = '';
+                                glowEl.style.overflow = '';
+                            } else {
+                                glowEl.style.display = 'none';
+                                glowEl.style.overflow = '';
+                            }
+                        }
+                    };
+                    requestAnimationFrame(step);
                 }
             }
 

@@ -86,6 +86,59 @@ if (typeof window.customTabsPlugin == 'undefined') {
                     button.classList.add("emby-tab-button", "emby-button");
                     button.setAttribute("data-index", i + 2);
                     button.setAttribute("id", customTabId);
+
+                    if (config.GlowEnabled) {
+                        const glowColor = config.GlowColor || "#00ffff";
+                        const glowIntensity = config.GlowIntensity != null ? config.GlowIntensity : 10;
+                        const blur1 = glowIntensity;
+                        const blur2 = glowIntensity * 2;
+                        const blur3 = glowIntensity * 3;
+
+                        if (config.HeartbeatEnabled) {
+                            const speed = config.HeartbeatSpeed != null ? config.HeartbeatSpeed : 800;
+                            const animName = `customTabHeartbeat_${i}`;
+                            const pulseBlur1 = Math.round(blur1 * 1.5);
+                            const pulseBlur2 = Math.round(blur2 * 1.5);
+                            const pulseBlur3 = Math.round(blur3 * 1.5);
+                            const keyframes = `@keyframes ${animName}{0%,100%{box-shadow:0 0 ${blur1}px ${glowColor},0 0 ${blur2}px ${glowColor},0 0 ${blur3}px ${glowColor}}50%{box-shadow:0 0 ${pulseBlur1}px ${glowColor},0 0 ${pulseBlur2}px ${glowColor},0 0 ${pulseBlur3}px ${glowColor}}}`;
+                            if (!document.getElementById('customTabsHeartbeatStyles')) {
+                                const styleEl = document.createElement('style');
+                                styleEl.id = 'customTabsHeartbeatStyles';
+                                document.head.appendChild(styleEl);
+                            }
+                            const styleEl = document.getElementById('customTabsHeartbeatStyles');
+                            styleEl.textContent += keyframes;
+                            button.style.animation = `${animName} ${speed}ms infinite ease-in-out`;
+                        } else {
+                            button.style.boxShadow = `0 0 ${blur1}px ${glowColor}, 0 0 ${blur2}px ${glowColor}, 0 0 ${blur3}px ${glowColor}`;
+                        }
+
+                        if (config.RgbAnimationEnabled) {
+                            const speed = config.RgbSpeed != null ? config.RgbSpeed : 2000;
+                            const rgbAnimName = `customTabRgb_${i}`;
+                            const glowIntensity = config.GlowIntensity != null ? config.GlowIntensity : 10;
+                            const blur1 = glowIntensity;
+                            const blur2 = glowIntensity * 2;
+                            const blur3 = glowIntensity * 3;
+                            let keyframeStops = '';
+                            const stops = 12;
+                            for (let s = 0; s <= stops; s++) {
+                                const hue = (360 / stops) * s;
+                                const pct = (s / stops) * 100;
+                                keyframeStops += `${pct}%{box-shadow:0 0 ${blur1}px hsl(${hue},100%,50%),0 0 ${blur2}px hsl(${hue},100%,50%),0 0 ${blur3}px hsl(${hue},100%,50%)}${s < stops ? ' ' : ''}`;
+                            }
+                            const keyframes = `@keyframes ${rgbAnimName}{${keyframeStops}}`;
+                            if (!document.getElementById('customTabsHeartbeatStyles')) {
+                                const styleEl = document.createElement('style');
+                                styleEl.id = 'customTabsHeartbeatStyles';
+                                document.head.appendChild(styleEl);
+                            }
+                            const styleEl = document.getElementById('customTabsHeartbeatStyles');
+                            styleEl.textContent += keyframes;
+                            button.style.animation = `${rgbAnimName} ${speed}ms infinite linear`;
+                        }
+                    }
+
                     button.appendChild(title);
 
                     tabsSlider.appendChild(button);
