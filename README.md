@@ -13,6 +13,11 @@
 
 This is a fork of [IAmParadox27/jellyfin-plugin-custom-tabs](https://github.com/IAmParadox27/jellyfin-plugin-custom-tabs) that adds fun visual effects to custom tab buttons — glow, heartbeat pulse, and RGB cycling animations. The original plugin lets you add custom tabs to the top navigation bar of the Jellyfin web client.
 
+## Prerequisites
+
+- Jellyfin Version `10.11.2`
+- [File Transformation](https://github.com/IAmParadox27/jellyfin-plugin-file-transformation) plugin at least v2.2.1.0
+
 ## Installation
 
 1. Download the latest `.zip` release from the [Releases](https://github.com/noahterbest/jellyfin-custom-tabs-with-effects/releases) page.
