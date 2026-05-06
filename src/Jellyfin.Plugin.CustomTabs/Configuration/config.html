@@ -229,89 +229,43 @@
                 removeTab: function(elem) {
                     elem.remove();
                 },
-                toggleHeartbeatContent: function(hbContentEl, show) {
+                animateSection: function(el, show, useHeight) {
                     const duration = 300;
-                    hbContentEl.style.display = 'block';
-                    hbContentEl.style.overflow = 'hidden';
-                    const startHeight = show ? 0 : hbContentEl.scrollHeight;
-                    const endHeight = show ? hbContentEl.scrollHeight : 0;
-                    hbContentEl.style.maxHeight = startHeight + 'px';
+                    const prop = useHeight ? 'height' : 'maxHeight';
+                    el.style.display = 'block';
+                    el.style.overflow = 'hidden';
+                    const startHeight = show ? 0 : el.scrollHeight;
+                    const endHeight = show ? el.scrollHeight : 0;
+                    el.style[prop] = startHeight + 'px';
                     const startTime = performance.now();
                     const step = (now) => {
                         const elapsed = now - startTime;
                         const progress = Math.min(elapsed / duration, 1);
                         const eased = 1 - Math.pow(1 - progress, 3);
                         const currentHeight = startHeight + (endHeight - startHeight) * eased;
-                        hbContentEl.style.maxHeight = currentHeight + 'px';
+                        el.style[prop] = currentHeight + 'px';
                         if (progress < 1) {
                             requestAnimationFrame(step);
                         } else {
                             if (show) {
-                                hbContentEl.style.maxHeight = '';
-                                hbContentEl.style.overflow = '';
+                                el.style[prop] = '';
+                                el.style.overflow = '';
                             } else {
-                                hbContentEl.style.maxHeight = '0';
-                                hbContentEl.style.overflow = 'hidden';
+                                el.style[prop] = '0';
+                                el.style.overflow = 'hidden';
                             }
                         }
                     };
                     requestAnimationFrame(step);
                 },
-                toggleRgbContent: function(rgbContentEl, show) {
-                    const duration = 300;
-                    rgbContentEl.style.display = 'block';
-                    rgbContentEl.style.overflow = 'hidden';
-                    const startHeight = show ? 0 : rgbContentEl.scrollHeight;
-                    const endHeight = show ? rgbContentEl.scrollHeight : 0;
-                    rgbContentEl.style.maxHeight = startHeight + 'px';
-                    const startTime = performance.now();
-                    const step = (now) => {
-                        const elapsed = now - startTime;
-                        const progress = Math.min(elapsed / duration, 1);
-                        const eased = 1 - Math.pow(1 - progress, 3);
-                        const currentHeight = startHeight + (endHeight - startHeight) * eased;
-                        rgbContentEl.style.maxHeight = currentHeight + 'px';
-                        if (progress < 1) {
-                            requestAnimationFrame(step);
-                        } else {
-                            if (show) {
-                                rgbContentEl.style.maxHeight = '';
-                                rgbContentEl.style.overflow = '';
-                            } else {
-                                rgbContentEl.style.maxHeight = '0';
-                                rgbContentEl.style.overflow = 'hidden';
-                            }
-                        }
-                    };
-                    requestAnimationFrame(step);
+                toggleHeartbeatContent: function(el, show) {
+                    CustomTabsConfig.animateSection(el, show, false);
                 },
-                toggleGlowSettings: function(glowEl, show) {
-                    const duration = 300;
-                    glowEl.style.display = 'block';
-                    glowEl.style.overflow = 'hidden';
-                    const startHeight = show ? 0 : glowEl.scrollHeight;
-                    const endHeight = show ? glowEl.scrollHeight : 0;
-                    glowEl.style.height = startHeight + 'px';
-                    const startTime = performance.now();
-                    const step = (now) => {
-                        const elapsed = now - startTime;
-                        const progress = Math.min(elapsed / duration, 1);
-                        const eased = 1 - Math.pow(1 - progress, 3);
-                        const currentHeight = startHeight + (endHeight - startHeight) * eased;
-                        glowEl.style.height = currentHeight + 'px';
-                        if (progress < 1) {
-                            requestAnimationFrame(step);
-                        } else {
-                            if (show) {
-                                glowEl.style.height = '';
-                                glowEl.style.overflow = '';
-                            } else {
-                                glowEl.style.display = 'none';
-                                glowEl.style.overflow = '';
-                            }
-                        }
-                    };
-                    requestAnimationFrame(step);
+                toggleRgbContent: function(el, show) {
+                    CustomTabsConfig.animateSection(el, show, false);
+                },
+                toggleGlowSettings: function(el, show) {
+                    CustomTabsConfig.animateSection(el, show, true);
                 }
             }
 
