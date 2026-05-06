@@ -1,4 +1,4 @@
-<h1 align="center">Custom Tabs — Glow Edition</h1>
+<h1 align="center">Custom Tabs — With Effects!</h1>
 <h2 align="center">A Jellyfin Plugin Fork</h2>
 <p align="center">
     <img alt="Logo" src="https://raw.githubusercontent.com/noahterbest/jellyfin-custom-tabs-with-effects/main/src/logo.jpg" />
